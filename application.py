@@ -11,7 +11,13 @@ app.config['SECRET_KEY'] = "DefaultSecret"
 
 @app.route("/")
 def sleepschedule():
-    with open("times.csv", "r") as f:
+
+    if is_production():
+        file = "/home/sleepschedule/mysite/times.csv"
+    else:
+        file = "times.csv"
+        
+    with open(file, "r") as f:
         r = csv.reader(f)
         out = []
         for line in r:
@@ -24,6 +30,11 @@ def add():
         w = csv.writer(f)
         w.writerow([pendulum.now("America/Toronto").format("YYYY/MM/DD HH:mm:ss")])
     return "HI"
+
+def is_production():
+    root_url = request.url_root
+    developer_url = 'http://127.0.0.1:5000/'
+    return root_url != developer_url
 
 # Run Flask if file is interpreted
 if __name__ == "__main__":
