@@ -2,13 +2,11 @@ from flask import Flask, render_template, request
 import os
 import subprocess
 import pendulum
-from flask_socketio import SocketIO
 import csv
 
 # Flask setup
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "DefaultSecret"
-socketio = SocketIO(app)
 
 
 @app.route("/")
