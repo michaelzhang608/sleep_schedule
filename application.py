@@ -11,7 +11,12 @@ app.config['SECRET_KEY'] = "DefaultSecret"
 
 @app.route("/")
 def sleepschedule():
-    return render_template("sleepschedule.html")
+    with open("times.csv", "r") as f:
+        r = csv.reader(f)
+        out = []
+        for line in r:
+            out.append(line)
+    return render_template("sleepschedule.html", times=out)
 
 @app.route("/add", methods=["POST"])
 def add():

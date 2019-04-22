@@ -4,8 +4,16 @@
 
 {% block main %}
   <h1>index</h1>
+  <table>
+    {% for time in times %}
+      <tr>
+        <td>{{ time }}</td>
+      </tr>
+    {% endfor %}
+  </table>
 
-  
+
+
 {% endblock %}
 
 {% block sub %}
