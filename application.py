@@ -16,7 +16,7 @@ def sleepschedule():
         file = "/home/sleepschedule/mysite/times.csv"
     else:
         file = "times.csv"
-        
+
     with open(file, "r") as f:
         r = csv.reader(f)
         out = []
@@ -26,7 +26,11 @@ def sleepschedule():
 
 @app.route("/add", methods=["POST"])
 def add():
-    with open("times.csv", "a") as f:
+    if is_production():
+        file = "/home/sleepschedule/mysite/times.csv"
+    else:
+        file = "times.csv"
+    with open(file, "a") as f:
         w = csv.writer(f)
         w.writerow([pendulum.now("America/Toronto").format("YYYY/MM/DD HH:mm:ss")])
     return "HI"
