@@ -11,9 +11,9 @@ app.config['SECRET_KEY'] = "DefaultSecret"
 @app.route("/")
 def sleepschedule():
     if is_production():
-        filename = "/home/sleepschedule/mysite/times.csv"
+        file = "/home/sleepschedule/mysite/times.csv"
     else:
-        filename = "times.csv"
+        file = "times.csv"
 
     with open(file, "r") as f:
         r = csv.reader(f)
@@ -25,10 +25,10 @@ def sleepschedule():
 @app.route("/add", methods=["POST"])
 def add():
     if is_production():
-        filename = "/home/sleepschedule/mysite/times.csv"
+        file = "/home/sleepschedule/mysite/times.csv"
     else:
-        filename = "times.csv"
-    with open(filename, "a") as f:
+        file = "times.csv"
+    with open(file, "a") as f:
         w = csv.writer(f)
         w.writerow([pendulum.now("America/Toronto").format("YYYY/MM/DD HH:mm:ss")])
     return "Success"
