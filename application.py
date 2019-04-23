@@ -8,14 +8,12 @@ import csv
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "DefaultSecret"
 
-
 @app.route("/")
 def sleepschedule():
-
     if is_production():
-        file = "/home/sleepschedule/mysite/times.csv"
+        filename = "/home/sleepschedule/mysite/times.csv"
     else:
-        file = "times.csv"
+        filename = "times.csv"
 
     with open(file, "r") as f:
         r = csv.reader(f)
@@ -27,14 +25,15 @@ def sleepschedule():
 @app.route("/add", methods=["POST"])
 def add():
     if is_production():
-        file = "/home/sleepschedule/mysite/times.csv"
+        filename = "/home/sleepschedule/mysite/times.csv"
     else:
-        file = "times.csv"
-    with open(file, "a") as f:
+        filename = "times.csv"
+    with open(filename, "a") as f:
         w = csv.writer(f)
         w.writerow([pendulum.now("America/Toronto").format("YYYY/MM/DD HH:mm:ss")])
-    return "HI"
+    return "Success"
 
+# Check if in production
 def is_production():
     root_url = request.url_root
     developer_url = 'http://127.0.0.1:5000/'
