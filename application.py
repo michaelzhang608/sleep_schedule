@@ -10,6 +10,9 @@ app.config['SECRET_KEY'] = "DefaultSecret"
 
 @app.route("/")
 def sleepschedule():
+    return render_template("sleepschedule.html", times=get_times())
+
+def get_times():
     if is_production():
         file = "/home/sleepschedule/mysite/times.csv"
     else:
@@ -17,10 +20,33 @@ def sleepschedule():
 
     with open(file, "r") as f:
         r = csv.reader(f)
-        out = []
+        times = []
         for line in r:
-            out.append(line)
-    return render_template("sleepschedule.html", times=out)
+            times.append(line[0])
+
+    # Remove impair value if present
+    if len(times) % 2 != 0:
+        times = times[:len(times)-1]
+
+    nights = []
+    mornings = []
+    for i, t in enumerate(times):
+        if i % 2 == 0:
+            mornings.append(pendulum.from_format(t, "YYYY/MM/DD HH:mm:ss", tz="America/Toronto"))
+        else:
+            nights.append(pendulum.from_format(t, "YYYY/MM/DD HH:mm:ss", tz="America/Toronto"))
+
+    sleeps = []
+    for i in range(len(mornings)):
+        sleep_mins = nights[i].diff(mornings[i]).in_minutes()
+        sleep_hours = nights[i].diff(mornings[i]).in_hours()
+
+        extra_mins = sleep_mins - sleep_hours * 60
+        formatted_sleep_time = f"{sleep_hours} hours {extra_mins} mins"
+
+        sleeps.append([mornings[i].format("YYYY/MM/DD"), nights[i].format("HH:mm:ss"), mornings[i].format("HH:mm:ss"), sleep_mins, formatted_sleep_time])
+
+    return sleeps
 
 @app.route("/add", methods=["POST"])
 def add():

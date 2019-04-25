@@ -4,15 +4,19 @@
 
 {% block main %}
   <h1>index</h1>
-  <table>
+  
+  <table id="info_display"></table>
+  <!-- Hidden, only used for js -->
+
+  <div id="times">
     {% for time in times %}
-      <tr>
-        <td>{{ time }}</td>
-      </tr>
+      <div>
+      {% for item in time %}
+        <div>{{ item }}</div>
+      {% endfor %}
+      </div>
     {% endfor %}
-  </table>
-
-
+  </div>
 
 {% endblock %}
 
