@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let div = document.createElement("div")
     div.innerHTML = temp[0] + ": "+ temp[4]
     info_display.append(div)
+    info_display.append(document.createElement("br"))
   }
 
 
