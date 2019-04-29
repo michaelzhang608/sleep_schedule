@@ -61,7 +61,15 @@ document.addEventListener("DOMContentLoaded", () => {
           ticks: {
             beginAtZero: true,
             stepSize: 60,
-            callback: x => moment.duration(x, "minutes").asHours() + " hours"
+            callback: x => {
+              hours = moment.duration(x, "minutes").asHours()
+              if (hours == 1) {
+                return hours + " hour"
+              }
+              else {
+                return hours + " hours"
+              }
+            }
           }
         }]
       }
