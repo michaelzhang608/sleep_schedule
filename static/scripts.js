@@ -60,9 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
         yAxes: [{
           ticks: {
             beginAtZero: true,
-            callback: x => {
-              return moment.duration(x, "minutes").humanize()
-            }
+            stepSize: 60,
+            callback: x => moment.duration(x, "minutes").asHours() + " hours"
           }
         }]
       }
