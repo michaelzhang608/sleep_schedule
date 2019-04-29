@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+import numpy as np
 import os
 import subprocess
 import pendulum
@@ -32,9 +33,9 @@ def get_times():
     mornings = []
     for i, t in enumerate(times):
         if i % 2 == 0:
-            mornings.append(pendulum.from_format(t, "YYYY/MM/DD HH:mm:ss", tz="America/Toronto"))
-        else:
             nights.append(pendulum.from_format(t, "YYYY/MM/DD HH:mm:ss", tz="America/Toronto"))
+        else:
+            mornings.append(pendulum.from_format(t, "YYYY/MM/DD HH:mm:ss", tz="America/Toronto"))
 
     sleeps = []
     for i in range(len(mornings)):
@@ -44,7 +45,8 @@ def get_times():
         extra_mins = sleep_mins - sleep_hours * 60
         formatted_sleep_time = f"{sleep_hours} hours {extra_mins} mins"
 
-        sleeps.append([mornings[i].format("YYYY/MM/DD"), nights[i].format("HH:mm:ss"), mornings[i].format("HH:mm:ss"), sleep_mins, formatted_sleep_time])
+        sleeps.append([mornings[i].format("YYYY/MM/DD"), nights[i].format("YYYY/MM/DD HH:mm:ss"), mornings[i].format("YYYY/MM/DD HH:mm:ss"), sleep_mins, formatted_sleep_time])
+
 
     return sleeps
 

@@ -45,7 +45,14 @@ document.addEventListener("DOMContentLoaded", () => {
       tooltips: {
         callbacks: {
           label: function(x) {
-            return moment.duration(parseInt(x["value"]), "minutes").humanize()
+            let time = times[x["index"]]
+            let sleep_time = moment(time[1], "YYYY/MM/DD HH:mm:ss").format("h:mm a")
+            let wake_time = moment(time[2], "YYYY/MM/DD HH:mm:ss").format("h:mm a")
+            return [
+              "Sleep: " + sleep_time,
+              "Wake: " + wake_time,
+              "Rested: " + time[4]
+            ]
           }
         }
       },
