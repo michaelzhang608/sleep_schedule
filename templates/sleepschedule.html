@@ -1,12 +1,12 @@
 {% extends "template.html" %}
 
-{% block title %} index {% endblock %}
+{% block title %} Sleep Schedule {% endblock %}
 
 {% block main %}
-  <h1>index</h1>
-  
-  <table id="info_display"></table>
-  <!-- Hidden, only used for js -->
+  <h1>Sleep Schedule </h1>
+
+  <!-- <table id="info_display"></table>
+  <!-- Hidden, only used for js --> -->
 
   <div id="times">
     {% for time in times %}
@@ -18,6 +18,10 @@
     {% endfor %}
   </div>
 
+  <canvas id="myChart" width="400" height="400"></canvas>
+  <br>
+  <br>
+  <br>
 {% endblock %}
 
 {% block sub %}
@@ -25,5 +29,5 @@
 {% endblock %}
 
 {% block footer %}
-  <p>Created by you</p>
+  <p>Created by someone</p>
 {% endblock %}
