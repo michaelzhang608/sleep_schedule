@@ -7,19 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let display = $("#info_display")
   let times = []
   for (let i = 0; i < times_html.length; i++) {
-
     let time_items = $(times_html[i]).children()
     let temp = []
     for (let i2 = 0; i2 < time_items.length; i2++) {
-
       temp.push(time_items[i2].innerHTML)
     }
     times.push(temp)
-
-    let div = document.createElement("div")
-    div.innerHTML = temp[0] + ": "+ temp[4]
-    // info_display.append(div)
-    // info_display.append(document.createElement("br"))
   }
 
   var ctx = document.getElementById('myChart')
@@ -31,14 +24,21 @@ document.addEventListener("DOMContentLoaded", () => {
           label: "Individual Sleep Times",
           data: times.map(x=>x[3])
         },{
-          label: "Sleep Times Trend",
+          label: "Sleep Times Smooth",
           data: times.map(x=>x[3]),
           type: "line",
           borderColor: 'rgba(153, 44, 127)',
           backgroundColor: 'rgba(153, 44, 127)',
-          pointBackgroundColor: 'rgba(0, 0, 0, 0)',
-          pointBorderColor: 'rgba(0, 0, 0, 0)',
-          fill: false
+          fill: false,
+          radius: 0
+        },{
+          label: "Sleep Trend",
+          data: times.map(x=>x[5]),
+          type: "line",
+          borderColor: 'rgba(219, 116, 26)',
+          backgroundColor: 'rgba(219, 116, 26)',
+          fill: false,
+          radius: 0
         }]
     },
     options: {
@@ -57,13 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       },
       scales: {
-        xAxes: [{
-          ticks: {
-            // callback: x => {
-            //   return moment(x, "dddd MMM D").format("MMM D")
-            // }
-          }
-        }],
         yAxes: [{
           ticks: {
             beginAtZero: true,

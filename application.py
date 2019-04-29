@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from numpy.polynomial.polynomial import polyfit
 import numpy as np
 import os
 import subprocess
@@ -11,7 +12,8 @@ app.config['SECRET_KEY'] = "DefaultSecret"
 
 @app.route("/")
 def sleepschedule():
-    return render_template("sleepschedule.html", times=get_times())
+    out = get_times()
+    return render_template("sleepschedule.html", times=out[0], average=out[1], slope=out[2])
 
 def get_times():
     if is_production():
@@ -47,8 +49,27 @@ def get_times():
 
         sleeps.append([mornings[i].format("YYYY/MM/DD"), nights[i].format("YYYY/MM/DD HH:mm:ss"), mornings[i].format("YYYY/MM/DD HH:mm:ss"), sleep_mins, formatted_sleep_time])
 
+    # Get 5 day average sleep time
+    total = 0
+    for i in range(5):
+        total += sleeps[i][3]
+    average = pendulum.duration(minutes=total // 5).in_words()
 
-    return sleeps
+
+    # Line of best fit
+    x = np.arange(len(sleeps))
+    y = [s[3] for s in sleeps]
+    b, m = polyfit(x, y, 1)
+
+    y = m * x + b
+
+    sleeps = [sleeps[i] + [y[i]] for i in range(len(sleeps))]
+    slope = int(m)
+    if slope >= 0:
+        slope = "+" + str(slope)
+    else:
+        slope = "-" + str(slope)
+    return [sleeps, average, slope]
 
 @app.route("/add", methods=["POST"])
 def add():
