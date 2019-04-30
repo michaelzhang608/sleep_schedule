@@ -68,7 +68,7 @@ def get_times():
     if slope >= 0:
         slope = "+" + str(slope)
     else:
-        slope = "-" + str(slope)
+        slope = str(slope)
     return [sleeps, average, slope]
 
 @app.route("/add", methods=["POST"])
