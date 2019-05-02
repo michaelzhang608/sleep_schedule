@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Javascript Loaded")
 
+  // TEST
 
   // Get times
   let times_html = $("#times").children()
