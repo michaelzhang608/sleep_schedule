@@ -51,7 +51,7 @@ def get_times():
 
     # Get 5 day average sleep time
     total = 0
-    for i in range(5):
+    for i in range(-1, -5, -1):
         total += sleeps[i][3]
     average = pendulum.duration(minutes=total // 5).in_words()
 
