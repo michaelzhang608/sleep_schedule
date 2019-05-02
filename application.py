@@ -51,24 +51,26 @@ def get_times():
 
     # Get 5 day average sleep time
     total = 0
-    for i in range(-1, -5, -1):
+    for i in range(-1, -6, -1):
+        print(i)
         total += sleeps[i][3]
     average = pendulum.duration(minutes=total // 5).in_words()
 
 
-    # Line of best fit
-    x = np.arange(len(sleeps))
-    y = [s[3] for s in sleeps]
+    # 5 Day line of best fit
+    x = np.arange(len(sleeps[-5:]))
+    y = [s[3] for s in sleeps[-5:]]
     b, m = polyfit(x, y, 1)
-
     y = m * x + b
 
-    sleeps = [sleeps[i] + [y[i]] for i in range(len(sleeps))]
+    sleeps = sleeps[:-5] + [sleeps[-5:][i] + [y[i]] for i in range(5)]
+
     slope = int(m)
     if slope >= 0:
         slope = "+" + str(slope)
     else:
         slope = str(slope)
+
     return [sleeps, average, slope]
 
 @app.route("/add", methods=["POST"])

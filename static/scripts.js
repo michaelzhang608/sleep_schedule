@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
           fill: false,
           radius: 0
         },{
-          label: "Sleep Trend",
+          label: "5-Day Sleep Trend",
           data: times.map(x=>x[5]),
           type: "line",
           borderColor: 'rgba(219, 116, 26)',
