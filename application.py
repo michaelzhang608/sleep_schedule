@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from numpy.polynomial.polynomial import polyfit
 import numpy as np
 import os
+from utils import get_sleeps
 import subprocess
 import pendulum
 import csv
@@ -16,45 +17,34 @@ def sleepschedule():
     return render_template("sleepschedule.html", times=out[0], average=out[1], slope=out[2])
 
 def get_times():
+
+    # Get sleeps
     if is_production():
         file = "/home/sleepschedule/mysite/times.csv"
     else:
         file = "times.csv"
-
-    with open(file, "r") as f:
-        r = csv.reader(f)
-        times = []
-        for line in r:
-            times.append(line[0])
-
-    # Remove impair value if present
-    if len(times) % 2 != 0:
-        times = times[:len(times)-1]
-
-    nights = []
-    mornings = []
-    for i, t in enumerate(times):
-        if i % 2 == 0:
-            nights.append(pendulum.from_format(t, "YYYY/MM/DD HH:mm:ss", tz="America/Toronto"))
-        else:
-            mornings.append(pendulum.from_format(t, "YYYY/MM/DD HH:mm:ss", tz="America/Toronto"))
-
-    sleeps = []
-    for i in range(len(mornings)):
-        sleep_mins = nights[i].diff(mornings[i]).in_minutes()
-        sleep_hours = nights[i].diff(mornings[i]).in_hours()
-
-        extra_mins = sleep_mins - sleep_hours * 60
-        formatted_sleep_time = f"{sleep_hours} hours {extra_mins} mins"
-
-        sleeps.append([mornings[i].format("YYYY/MM/DD"), nights[i].format("YYYY/MM/DD HH:mm:ss"), mornings[i].format("YYYY/MM/DD HH:mm:ss"), sleep_mins, formatted_sleep_time])
+    sleeps = get_sleeps(file)
 
     # Get 5 day average sleep time
     total = 0
     for i in range(-1, -6, -1):
-        print(i)
         total += sleeps[i][3]
     average = pendulum.duration(minutes=total // 5).in_words()
+
+    averages = []
+    for i in range(len(sleeps)):
+        count = 5
+        total = 0
+        for i2 in range(5):
+            try:
+                total += sleeps[i - i2][3]
+            except:
+                count -= 1
+        d = pendulum.duration(minutes=total // count)
+        averages.append(d.hours * 60 + d.minutes)
+
+    sleeps = [sleeps[i] + [averages[i]] for i in range(len(sleeps))]
+    print(sleeps)
 
 
     # 5 Day line of best fit
