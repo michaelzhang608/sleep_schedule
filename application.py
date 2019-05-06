@@ -22,8 +22,9 @@ def sleepschedule():
     out = get_times()
     return render_template("sleepschedule.html", times=out[0], average=out[1], slope=out[2])
 
-@app.route("/log")
+@app.route("/log", methods=["POST"])
 def invoke_skill():
+    print("IN")
     return skill_adapter.dispatch_request()
 
 def get_times():
