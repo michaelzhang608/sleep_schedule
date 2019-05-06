@@ -36,7 +36,7 @@ def launch_request_handler(handler_input):
         speech_text = "goodnight"
     else:
         speech_text = "goodmorning"
-    
+
     return build_response(handler_input, speech_text, "Sleep Schedule", end=True)
 
 @sb.request_handler(can_handle_func=is_intent_name("TimeCancelIntent"))
@@ -149,10 +149,6 @@ def get_times():
         slope = str(slope)
 
     return [sleeps, average, slope]
-
-@app.route("/add", methods=["POST"])
-def add():
-
 
 # Check if in production
 def is_production():
