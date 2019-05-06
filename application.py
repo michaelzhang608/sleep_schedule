@@ -1,23 +1,32 @@
+from flask_ask_sdk.skill_adapter import SkillAdapter
+from ask_sdk_core.skill_builder import SkillBuilder
 from flask import Flask, render_template, request
 from numpy.polynomial.polynomial import polyfit
-import numpy as np
-import os
 from utils import get_sleeps
+import numpy as np
 import subprocess
 import pendulum
 import csv
+import os
 
 # Flask setup
 app = Flask(__name__)
+skill_builder = SkillBuilder()
 app.config['SECRET_KEY'] = "DefaultSecret"
+
+skill_adapter = SkillAdapter(
+    skill=skill_builder.create(), skill_id="amzn1.ask.skill.b134fcc6-c7e1-47f6-a1ac-46b2216f665a", app=app)
 
 @app.route("/")
 def sleepschedule():
     out = get_times()
     return render_template("sleepschedule.html", times=out[0], average=out[1], slope=out[2])
 
-def get_times():
+@app.route("/log")
+def invoke_skill():
+    return skill_adapter.dispatch_request()
 
+def get_times():
     # Get sleeps
     if is_production():
         file = "/home/sleepschedule/mysite/times.csv"
@@ -44,8 +53,6 @@ def get_times():
         averages.append(d.hours * 60 + d.minutes)
 
     sleeps = [sleeps[i] + [averages[i]] for i in range(len(sleeps))]
-    print(sleeps)
-
 
     # 5 Day line of best fit
     x = np.arange(len(sleeps[-5:]))
