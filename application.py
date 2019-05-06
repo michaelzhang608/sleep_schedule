@@ -7,7 +7,6 @@ from flask_ask_sdk.skill_adapter import SkillAdapter
 from flask import Flask, render_template, request
 from numpy.polynomial.polynomial import polyfit
 from utils import get_sleeps
-import requests
 import numpy as np
 import subprocess
 import pendulum
@@ -24,16 +23,20 @@ sb = SkillBuilder()
 @sb.request_handler(can_handle_func=is_request_type("LaunchRequest"))
 def launch_request_handler(handler_input):
 
-    r = requests.post("http://sleepschedule.pythonanywhere.com/add")
-    if r.text == "Success":
-        hour = pendulum.now("America/Toronto").hour
-        if hour >= 17 and hour <= 3:
-            speech_text = "goodnight"
-        else:
-            speech_text = "goodmorning"
+    if is_production():
+        file = "/home/sleepschedule/mysite/times.csv"
     else:
-        speech_text = "sorry, something went wrong with the server"
+        file = "times.csv"
+    with open(file, "a") as f:
+        w = csv.writer(f)
+        w.writerow([pendulum.now("America/Toronto").format("YYYY/MM/DD HH:mm:ss")])
 
+    hour = pendulum.now("America/Toronto").hour
+    if hour >= 17 and hour <= 3:
+        speech_text = "goodnight"
+    else:
+        speech_text = "goodmorning"
+    
     return build_response(handler_input, speech_text, "Sleep Schedule", end=True)
 
 @sb.request_handler(can_handle_func=is_intent_name("TimeCancelIntent"))
@@ -149,14 +152,7 @@ def get_times():
 
 @app.route("/add", methods=["POST"])
 def add():
-    if is_production():
-        file = "/home/sleepschedule/mysite/times.csv"
-    else:
-        file = "times.csv"
-    with open(file, "a") as f:
-        w = csv.writer(f)
-        w.writerow([pendulum.now("America/Toronto").format("YYYY/MM/DD HH:mm:ss")])
-    return "Success"
+
 
 # Check if in production
 def is_production():
