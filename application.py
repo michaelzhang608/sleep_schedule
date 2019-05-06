@@ -7,6 +7,7 @@ from flask_ask_sdk.skill_adapter import SkillAdapter
 from flask import Flask, render_template, request
 from numpy.polynomial.polynomial import polyfit
 from utils import get_sleeps
+import requests
 import numpy as np
 import subprocess
 import pendulum
@@ -70,7 +71,7 @@ def session_ended_request_handler(handler_input):
 
 @sb.exception_handler(can_handle_func=lambda i, e: True)
 def all_exception_handler(handler_input, exception):
-    # Log the exception in CloudWatch Logs
+    # Log the exception
     print(exception)
 
     speech_text = "Sorry, I didn't get it. Can you please say it again?"
@@ -78,9 +79,6 @@ def all_exception_handler(handler_input, exception):
 
 skill_adapter = SkillAdapter(
     skill=sb.create(), skill_id="amzn1.ask.skill.b134fcc6-c7e1-47f6-a1ac-46b2216f665a", app=app)
-
-
-
 
 def build_response(input, text, card_title="", card_content=None, end=False, ask=False):
     """ Function to build responses """
