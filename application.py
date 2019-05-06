@@ -1,3 +1,4 @@
+from ask_sdk_core.utils import is_request_type, is_intent_name
 from flask_ask_sdk.skill_adapter import SkillAdapter
 from ask_sdk_core.skill_builder import SkillBuilder
 from flask import Flask, render_template, request
@@ -14,8 +15,82 @@ app = Flask(__name__)
 skill_builder = SkillBuilder()
 app.config['SECRET_KEY'] = "DefaultSecret"
 
+sb = SkillBuilder()
+
+@sb.request_handler(can_handle_func=is_request_type("LaunchRequest"))
+def launch_request_handler(handler_input):
+
+    r = requests.post("http://sleepschedule.pythonanywhere.com/add")
+    if r.text == "Success":
+        hour = pendulum.now("America/Toronto").hour
+        if hour >= 17 and hour <= 3:
+            speech_text = "goodnight"
+        else:
+            speech_text = "goodmorning"
+    else:
+        speech_text = "sorry, something went wrong with the server"
+
+    return build_response(handler_input, speech_text, "Sleep Schedule", end=True)
+
+@sb.request_handler(can_handle_func=is_intent_name("TimeCancelIntent"))
+def sleep_time_intent_handler(handler_input):
+
+    speech_text = "Time cancelling feature is yet to be developed"
+    return build_response(handler_input, speech_text, "Sleep Schedule")
+
+@sb.request_handler(can_handle_func=is_intent_name("AMAZON.HelpIntent"))
+def help_intent_handler(handler_input):
+    speech_text = "I track what time you went to sleep and wake up"
+    return build_response(handler_input, speech_text, "Sleep Schedule", ask=True)
+
+@sb.request_handler(can_handle_func=is_intent_name("AMAZON.FallbackIntent"))
+def help_intent_handler(handler_input):
+
+    print(handler_input)
+    speech_text = "Sorry, sleep schedule didn't get that."
+
+    return build_response(handler_input, speech_text, "Sleep Schedule", ask=True)
+
+@sb.request_handler(
+    can_handle_func=lambda input:
+        is_intent_name("AMAZON.CancelIntent")(input) or
+        is_intent_name("AMAZON.StopIntent")(input))
+def cancel_and_stop_intent_handler(handler_input):
+    speech_text = "Goodbye!"
+
+    return build_response(handler_input, speech_text, "Sleep Schedule", shouldEndSession=True)
+
+@sb.request_handler(can_handle_func=is_request_type("SessionEndedRequest"))
+def session_ended_request_handler(handler_input):
+    #any cleanup logic goes here
+    return handler_input.response_builder.response
+
+@sb.exception_handler(can_handle_func=lambda i, e: True)
+def all_exception_handler(handler_input, exception):
+    # Log the exception in CloudWatch Logs
+    print(exception)
+
+    speech_text = "Sorry, I didn't get it. Can you please say it again?"
+    return build_response(handler_input, speech_text, "Sleep Schedule", ask=True)
+
 skill_adapter = SkillAdapter(
-    skill=skill_builder.create(), skill_id="amzn1.ask.skill.b134fcc6-c7e1-47f6-a1ac-46b2216f665a", app=app)
+    skill=sb.create(), skill_id="amzn1.ask.skill.b134fcc6-c7e1-47f6-a1ac-46b2216f665a", app=app)
+
+
+
+
+def build_response(input, text, card_title="", card_content=None, end=False, ask=False):
+    """ Function to build responses """
+
+    if not card_content:
+        card_content = text
+    input.response_builder.speak(text)
+    input.response_builder.set_card(SimpleCard(card_title, card_content))
+    input.response_builder.set_should_end_session(end)
+    if ask:
+        input.response_builder.ask(text)
+
+    return input.response_builder.response
 
 @app.route("/")
 def sleepschedule():
