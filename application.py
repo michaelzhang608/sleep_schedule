@@ -1,6 +1,9 @@
-from ask_sdk_core.utils import is_request_type, is_intent_name
-from flask_ask_sdk.skill_adapter import SkillAdapter
 from ask_sdk_core.skill_builder import SkillBuilder
+from ask_sdk_core.utils import is_intent_name, is_request_type
+from ask_sdk_model.ui import SimpleCard
+from ask_sdk_model.ui.link_account_card import LinkAccountCard
+from ask_sdk_model.device import Device
+from flask_ask_sdk.skill_adapter import SkillAdapter
 from flask import Flask, render_template, request
 from numpy.polynomial.polynomial import polyfit
 from utils import get_sleeps
